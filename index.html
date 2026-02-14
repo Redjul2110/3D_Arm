@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Arm - Interactive Robot Simulator</title>
+    <meta name="description" content="Interactive 3D robot arm simulator with manual joint controls">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Import Map for Three.js ES Modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <!-- Home Screen -->
+    <div id="homeScreen" class="screen active">
+        <canvas id="backgroundCanvas"></canvas>
+
+        <div class="home-header">
+            <div class="brand">
+                <h1 class="brand-title">3D Arm</h1>
+                <a href="https://redjul2110.github.io/RedJGames/" target="_blank" class="brand-link">
+                    <span class="link-icon">→</span> RedJGames
+                </a>
+            </div>
+        </div>
+
+        <div class="home-content">
+            <div class="glass-card hero-card">
+                <div class="card-glow"></div>
+                <h2 class="hero-title">3D<br>Arm</h2>
+                <p class="hero-description">
+                    Steuere einen virtuellen 6-achsigen Roboterarm in Echtzeit.
+                </p>
+
+                <button id="startSimulatorMain" class="btn-primary">
+                    <span class="btn-text">Simulator starten</span>
+                    <span class="btn-glow"></span>
+                </button>
+
+                <div class="menu-grid">
+                    <div id="startSimulator" class="menu-card">
+                        <div class="card-icon">🎮</div>
+                        <h3>Freies Spiel</h3>
+                        <p>Manuelle Steuerung aller Gelenke</p>
+                    </div>
+
+                    <div id="startLevels" class="menu-card">
+                        <div class="card-icon">🏆</div>
+                        <h3>Level Auswahl</h3>
+                        <p>Löse Aufgaben und sammle Sterne</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="floating-orbs">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <div class="floating-icons">
+            <div class="icon-float">⚙️</div>
+            <div class="icon-float">🔧</div>
+            <div class="icon-float">🤖</div>
+            <div class="icon-float">⚡</div>
+            <div class="icon-float">🎯</div>
+        </div>
+    </div>
+
+    <!-- Level Selection Screen -->
+    <div id="levelScreen" class="screen">
+        <div class="screen-bg"></div>
+
+        <div class="screen-header">
+            <button id="backFromLevels" class="btn-back">
+                <span>←</span> Zurück
+            </button>
+            <h2 class="screen-title">Level Auswahl</h2>
+        </div>
+
+        <div class="level-container">
+            <div id="levelsGrid" class="levels-grid">
+                <!-- Level cards will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulator Screen -->
+    <div id="simulatorScreen" class="screen">
+        <canvas id="robotCanvas"></canvas>
+
+        <div class="simulator-header">
+            <button id="backToHome" class="btn-back">
+                <span>←</span> Zurück
+            </button>
+            <h2 class="simulator-title">3D Roboterarm Simulator</h2>
+        </div>
+
+        <div class="control-panel glass-card">
+            <h3 class="control-title">Gelenk-Steuerung</h3>
+
+            <div class="control-group">
+                <label for="baseRotation" class="control-label">
+                    <span class="label-text">Basis Rotation</span>
+                    <span id="baseValue" class="label-value">0°</span>
+                </label>
+                <input type="range" id="baseRotation" class="slider" min="-180" max="180" value="0" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="shoulder" class="control-label">
+                    <span class="label-text">Schulter</span>
+                    <span id="shoulderValue" class="label-value">0°</span>
+                </label>
+                <input type="range" id="shoulder" class="slider" min="-90" max="90" value="0" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="elbow" class="control-label">
+                    <span class="label-text">Ellbogen</span>
+                    <span id="elbowValue" class="label-value">0°</span>
+                </label>
+                <input type="range" id="elbow" class="slider" min="-135" max="135" value="0" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="wristPitch" class="control-label">
+                    <span class="label-text">Handgelenk Pitch</span>
+                    <span id="wristPitchValue" class="label-value">0°</span>
+                </label>
+                <input type="range" id="wristPitch" class="slider" min="-90" max="90" value="0" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="wristRoll" class="control-label">
+                    <span class="label-text">Handgelenk Roll</span>
+                    <span id="wristRollValue" class="label-value">0°</span>
+                </label>
+                <input type="range" id="wristRoll" class="slider" min="-180" max="180" value="0" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="gripper" class="control-label">
+                    <span class="label-text">Greifer</span>
+                    <span id="gripperValue" class="label-value">0°</span>
+                </label>
+                <input type="range" id="gripper" class="slider" min="0" max="45" value="0" step="1">
+            </div>
+
+            <button id="resetPosition" class="btn-secondary">
+                <span>🔄 Reset Position</span>
+            </button>
+        </div>
+
+        <div class="sandbox-toolbar glass-card">
+            <h4 class="toolbar-title">Spawn Objects</h4>
+
+            <div class="spawn-controls">
+                <div class="coord-input-group">
+                    <input type="number" id="spawnX" placeholder="X" value="2" step="0.1" title="X Position">
+                    <input type="number" id="spawnY" placeholder="Y" value="0.2" step="0.1" title="Y Position">
+                    <input type="number" id="spawnZ" placeholder="Z" value="0" step="0.1" title="Z Position">
+                </div>
+            </div>
+
+            <div class="spawn-buttons">
+                <button id="spawnCube" class="btn-icon" title="Spawn Cube"><span>🟧</span></button>
+                <button id="spawnSphere" class="btn-icon" title="Spawn Sphere"><span>🔴</span></button>
+                <button id="spawnCylinder" class="btn-icon" title="Spawn Cylinder"><span>🟠</span></button>
+                <button id="clearObjects" class="btn-icon btn-danger" title="Clear All"><span>🗑️</span></button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="backgroundEffects.js"></script>
+    <script type="module" src="robotArm.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
